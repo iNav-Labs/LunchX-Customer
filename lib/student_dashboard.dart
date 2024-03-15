@@ -1,10 +1,11 @@
-// ignore_for_file: prefer_const_constructors, library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api
 
+import 'package:flutter/material.dart';
 import 'package:lunchx_customer/Body%20section/body.dart';
 import 'package:lunchx_customer/order_tracking.dart';
-import 'order_history.dart';
-import 'package:flutter/material.dart';
+import 'package:lunchx_customer/order_history.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lunchx_customer/login.dart'; // Import your login screen
 
 class YourDrawer extends StatefulWidget {
   final Function(bool) onShopStatusChanged;
@@ -22,9 +23,9 @@ class _YourDrawerState extends State<YourDrawer> {
       onTap: onTap,
       child: Container(
         width: 30,
-        padding: EdgeInsets.symmetric(horizontal: 70.0, vertical: 10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 70.0, vertical: 10.0),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(
@@ -52,12 +53,11 @@ class _YourDrawerState extends State<YourDrawer> {
       backgroundColor: Colors.white,
       child: ListView(
         children: [
-          SizedBox(
+          const SizedBox(
             height: 50,
           ),
-
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 50.0),
+            margin: const EdgeInsets.symmetric(horizontal: 50.0),
             height: 200,
             decoration: BoxDecoration(
               color: const Color.fromARGB(255, 255, 255, 255),
@@ -86,7 +86,7 @@ class _YourDrawerState extends State<YourDrawer> {
                       color: Colors.black,
                     ),
                   ),
-                  SizedBox(height: 10), // Add space between sections
+                  const SizedBox(height: 10), // Add space between sections
 
                   Text(
                     'Hostel',
@@ -102,7 +102,7 @@ class _YourDrawerState extends State<YourDrawer> {
                       color: Colors.black,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
 
                   Text(
                     'Phone Number',
@@ -123,9 +123,9 @@ class _YourDrawerState extends State<YourDrawer> {
             ),
           ),
 
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 50.0),
+            margin: const EdgeInsets.symmetric(horizontal: 50.0),
             height: 100,
             decoration: BoxDecoration(
               color: const Color.fromARGB(255, 255, 255, 255),
@@ -153,7 +153,7 @@ class _YourDrawerState extends State<YourDrawer> {
                     style: GoogleFonts.outfit(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF6552FE),
+                      color: const Color(0xFF6552FE),
                     ),
                   ),
                   Text(
@@ -168,7 +168,7 @@ class _YourDrawerState extends State<YourDrawer> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           _buildDrawerItem(context, 'Order History', () {
@@ -176,20 +176,28 @@ class _YourDrawerState extends State<YourDrawer> {
 
             Navigator.push(
               context,
+              MaterialPageRoute(builder: (context) => OrderHistoryScreen()),
+            );
+          }),
+          _buildDrawerItem(context, 'Logout', () {
+            // Perform logout
+            Navigator.pushAndRemoveUntil(
+              context,
               MaterialPageRoute(
                   builder: (context) =>
-                      OrderHistoryScreen()), //<<<<<<-------------------- Change Screen Name after Import for Order & Analytics
+                      const Login()), // Navigate to login screen
+              (route) => false, // Remove all routes until login screen
             );
           }),
           Container(
-            margin: EdgeInsets.only(top: 250.0),
+            margin: const EdgeInsets.only(top: 200.0),
             child: Image.asset(
               'assets/logo2.png', // Adjust the path accordingly
               height: 50.0,
               width: 40.0,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
 
@@ -233,6 +241,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -253,16 +262,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => OrderTracker()),
+                      MaterialPageRoute(
+                          builder: (context) => const OrderTracker()),
                     );
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Color(0xFF6552FE),
+                      color: const Color(0xFF6552FE),
                       borderRadius: BorderRadius.circular(15.0),
                     ),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 6.0),
                     child: Image.asset(
                       'assets/notify.gif',
                       width: 25,
@@ -280,7 +290,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // NULL
         },
       ),
-      body: BodySection(),
+      body: const BodySection(),
     );
   }
 }
+// No changes in the code

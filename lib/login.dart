@@ -1,9 +1,9 @@
-// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:lunchx_customer/student_dashboard.dart';
 import 'package:lunchx_customer/signup.dart';
+import 'package:lunchx_customer/student_dashboard.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -52,14 +52,15 @@ class _LoginState extends State<Login> {
                       labelText: 'Enter Your Password',
                       suffixIcon: GestureDetector(
                         onTap: () {
+                          // Toggle password visibility
                           setState(() {
                             _obscurePassword = !_obscurePassword;
                           });
                         },
                         child: Icon(
                           _obscurePassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
                       ),
                     ),
@@ -122,8 +123,7 @@ class _LoginState extends State<Login> {
         email: _emailController.text,
         password: _passwordController.text,
       );
-      Navigator.of(context)
-          .pop(); // to restrict user for not going back to login screen
+
       // If login successful, navigate to dashboard
       Navigator.pushReplacement(
         context,
@@ -155,3 +155,4 @@ class _LoginState extends State<Login> {
     );
   }
 }
+// No changes in the code
