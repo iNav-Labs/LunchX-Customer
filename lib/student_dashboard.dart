@@ -1,0 +1,286 @@
+// ignore_for_file: prefer_const_constructors, library_private_types_in_public_api
+
+import 'package:lunchx_customer/Body%20section/body.dart';
+import 'package:lunchx_customer/order_tracking.dart';
+import 'order_history.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class YourDrawer extends StatefulWidget {
+  final Function(bool) onShopStatusChanged;
+
+  const YourDrawer({super.key, required this.onShopStatusChanged});
+
+  @override
+  _YourDrawerState createState() => _YourDrawerState();
+}
+
+class _YourDrawerState extends State<YourDrawer> {
+  Widget _buildDrawerItem(
+      BuildContext context, String title, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 30,
+        padding: EdgeInsets.symmetric(horizontal: 70.0, vertical: 10.0),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: Colors.black,
+              width: 2.0,
+            ),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Text(
+            title,
+            style: GoogleFonts.outfit(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      backgroundColor: Colors.white,
+      child: ListView(
+        children: [
+          SizedBox(
+            height: 50,
+          ),
+
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 50.0),
+            height: 200,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 255, 255, 255),
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(
+                color: Colors.black,
+                width: 2.0,
+              ),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Name',
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Text(
+                    'Mansi Vora',
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 10), // Add space between sections
+
+                  Text(
+                    'Hostel',
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Text(
+                    'H.R.H (High Rise)',
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+
+                  Text(
+                    'Phone Number',
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Text(
+                    '+91 9408393005',
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          SizedBox(height: 20),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 50.0),
+            height: 100,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 255, 255, 255),
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(
+                color: Colors.black,
+                width: 2.0,
+              ),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Saved',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Text(
+                    '1 hr 31 mins',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF6552FE),
+                    ),
+                  ),
+                  Text(
+                    'till today!',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          _buildDrawerItem(context, 'Order History', () {
+            Navigator.pop(context); // Close the drawer
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      OrderHistoryScreen()), //<<<<<<-------------------- Change Screen Name after Import for Order & Analytics
+            );
+          }),
+          Container(
+            margin: EdgeInsets.only(top: 250.0),
+            child: Image.asset(
+              'assets/logo2.png', // Adjust the path accordingly
+              height: 50.0,
+              width: 40.0,
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+
+          Text(
+            'Customer Support',
+            style: GoogleFonts.outfit(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          // "graby.go" text
+          Text(
+            '+91 9408393005',
+            style: GoogleFonts.outfit(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  _DashboardScreenState createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  bool isShopOpen = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Image.asset(
+                    'assets/logo2.png',
+                    width: 110.0,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => OrderTracker()),
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color(0xFF6552FE),
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                    child: Image.asset(
+                      'assets/notify.gif',
+                      width: 25,
+                      height: 25,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      endDrawer: YourDrawer(
+        onShopStatusChanged: (status) {
+          // NULL
+        },
+      ),
+      body: BodySection(),
+    );
+  }
+}
