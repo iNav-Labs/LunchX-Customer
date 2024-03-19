@@ -61,7 +61,7 @@ class _BodySectionState extends State<BodySection> {
           Container(
             height: 100,
             margin: const EdgeInsets.symmetric(horizontal: 20),
-            padding: const EdgeInsets.only(left: 25),
+            padding: const EdgeInsets.only(left: 30),
             decoration: BoxDecoration(
               color: const Color(0xFF6552FE),
               borderRadius: BorderRadius.circular(18),
