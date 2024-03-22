@@ -1,10 +1,9 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:lunchx_customer/Details/user_registration.dart';
 import 'package:lunchx_customer/login.dart';
-import 'package:lunchx_customer/student_dashboard.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -125,21 +124,8 @@ class _SignUpState extends State<SignUp> {
         password: _passwordController.text,
       );
 
-      // Save user data to Firestore
-      await FirebaseFirestore.instance
-          .collection('LunchX')
-          .doc('customers')
-          .collection('users')
-          .doc(_emailController.text) // Using email as document ID
-          .set({
-        'email': _emailController.text,
-        'password': _passwordController.text,
-      });
-
-      // Sign-up success
       _showSignUpSuccessDialog(context);
     } catch (e) {
-      // Sign-up failure
       _showErrorDialog(context, e.toString());
     }
   }
@@ -155,11 +141,9 @@ class _SignUpState extends State<SignUp> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // Navigate to dashboard page
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const DashboardScreen()),
+                  MaterialPageRoute(builder: (context) => UserRegistration()),
                 );
               },
               child: const Text('OK'),

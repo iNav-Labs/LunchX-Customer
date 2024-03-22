@@ -90,7 +90,7 @@ class _BodySectionState extends State<BodySection> {
                 ),
                 Image.asset(
                   'assets/thumbnail_burger.png',
-                  height: 180,
+                  height: 200,
                   width: 180,
                   fit: BoxFit.cover,
                 ),
@@ -98,134 +98,141 @@ class _BodySectionState extends State<BodySection> {
             ),
           ),
 
-          // Top Dishes Heading with Arrow
-          Container(
-            alignment: Alignment.centerLeft,
-            color: const Color.fromARGB(255, 255, 255, 255),
-            margin: const EdgeInsets.only(top: 10, left: 30, right: 30),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Top Dishes',
-                  style: GoogleFonts.outfit(
-                    fontSize: 18,
-                    color: const Color.fromARGB(255, 102, 102, 102),
-                    backgroundColor: Colors.white,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                const SizedBox(width: 70.0),
-                Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(8.0),
-                      bottomRight: Radius.circular(8.0),
-                    ),
-                  ),
-                  padding: const EdgeInsets.all(6.0),
-                  child: const Icon(
-                    Icons.arrow_forward,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // // Top Dishes Heading with Arrow
+          // Container(
+          //   alignment: Alignment.centerLeft,
+          //   color: const Color.fromARGB(255, 255, 255, 255),
+          //   margin: const EdgeInsets.only(top: 10, left: 30, right: 30),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       Expanded(
+          //         // Wrap with Expanded
+          //         child: Text(
+          //           'Top Dishes',
+          //           style: GoogleFonts.outfit(
+          //             fontSize: 18,
+          //             color: const Color.fromARGB(255, 102, 102, 102),
+          //             backgroundColor: Colors.white,
+          //             fontWeight: FontWeight.w400,
+          //           ),
+          //         ),
+          //       ),
+          //       const SizedBox(width: 70.0),
+          //       Container(
+          //         decoration: const BoxDecoration(
+          //           color: Colors.white,
+          //           borderRadius: BorderRadius.only(
+          //             topRight: Radius.circular(8.0),
+          //             bottomRight: Radius.circular(8.0),
+          //           ),
+          //         ),
+          //         padding: const EdgeInsets.all(6.0),
+          //         child: const Icon(
+          //           Icons.arrow_forward,
+          //           color: Colors.black,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
 
-          // Horizontal Scrolling Cards
-          Container(
-            height: 130.0,
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            color: Colors.white,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: topPicks.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    // redirect to next page
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const CanteenMenuPage()),
-                    );
-                  },
-                  child: Container(
-                    alignment: Alignment.center,
-                    width: 120,
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    child: Container(
-                      width: 150,
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 255, 255, 255),
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            '${topPicks[index]['photo']}', // Replace with your image asset path
-                            height: 70, // Adjust the height as needed
-                            width: 70, // Adjust the width as needed
-                            fit: BoxFit.cover,
-                          ),
-                          Text(
-                            '${topPicks[index]['name']}',
-                            style: GoogleFonts.outfit(
-                              fontSize: 12,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            '${topPicks[index]['canteen']}',
-                            style: GoogleFonts.outfit(
-                              fontSize: 9,
-                              color: const Color(0xFF6552FE),
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+          // // Horizontal Scrolling Cards
+          // Container(
+          //   height: 130.0,
+          //   margin: const EdgeInsets.symmetric(horizontal: 20),
+          //   color: Colors.white,
+          //   child: ListView.builder(
+          //     scrollDirection: Axis.horizontal,
+          //     itemCount: topPicks.length,
+          //     itemBuilder: (context, index) {
+          //       return GestureDetector(
+          //         onTap: () {
+          //           // redirect to next page
+          //           Navigator.push(
+          //             context,
+          //             MaterialPageRoute(
+          //                 builder: (context) => const CanteenMenuPage()),
+          //           );
+          //         },
+          //         child: Container(
+          //           alignment: Alignment.center,
+          //           width: 120,
+          //           padding: const EdgeInsets.symmetric(vertical: 5),
+          //           child: Container(
+          //             width: 150,
+          //             margin: const EdgeInsets.symmetric(horizontal: 10),
+          //             decoration: BoxDecoration(
+          //               color: const Color.fromARGB(255, 255, 255, 255),
+          //               borderRadius: BorderRadius.circular(15),
+          //               boxShadow: [
+          //                 BoxShadow(
+          //                   color: Colors.grey.withOpacity(0.2),
+          //                   spreadRadius: 2,
+          //                   blurRadius: 5,
+          //                   offset: const Offset(0, 2),
+          //                 ),
+          //               ],
+          //             ),
+          //             child: Column(
+          //               mainAxisAlignment: MainAxisAlignment.center,
+          //               children: [
+          //                 Image.asset(
+          //                   '${topPicks[index]['photo']}', // Replace with your image asset path
+          //                   height: 70, // Adjust the height as needed
+          //                   width: 70, // Adjust the width as needed
+          //                   fit: BoxFit.cover,
+          //                 ),
+          //                 Text(
+          //                   '${topPicks[index]['name']}',
+          //                   style: GoogleFonts.outfit(
+          //                     fontSize: 12,
+          //                     color: Colors.black,
+          //                     fontWeight: FontWeight.bold,
+          //                   ),
+          //                 ),
+          //                 Text(
+          //                   '${topPicks[index]['canteen']}',
+          //                   style: GoogleFonts.outfit(
+          //                     fontSize: 9,
+          //                     color: const Color(0xFF6552FE),
+          //                     fontWeight: FontWeight.w400,
+          //                   ),
+          //                 ),
+          //               ],
+          //             ),
+          //           ),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
 
           // Canteens Heading with Arrow
           Container(
             alignment: Alignment.centerLeft,
-            color: const Color.fromARGB(255, 255, 255, 255),
+            color: const Color(0x00FFFFFF), // Transparent color
             margin: const EdgeInsets.only(top: 5, left: 30, right: 30),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Canteens / Shops',
-                  style: GoogleFonts.outfit(
-                    fontSize: 18,
-                    color: const Color.fromARGB(255, 102, 102, 102),
-                    backgroundColor: Colors.white,
-                    fontWeight: FontWeight.w400,
+                Expanded(
+                  // Wrap with Expanded
+                  child: Text(
+                    'Canteens / Shops',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      color: const Color.fromARGB(255, 102, 102, 102),
+                      backgroundColor:
+                          Colors.transparent, // Transparent background
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 70.0),
                 Container(
                   decoration: const BoxDecoration(
-                    color: Colors.white,
+                    color: Color(0x0fffffff), // Transparent color
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(8.0),
                       bottomRight: Radius.circular(8.0),

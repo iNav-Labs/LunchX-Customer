@@ -1,11 +1,13 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lunchx_customer/Body%20section/body.dart';
 import 'package:lunchx_customer/order_tracking.dart';
 import 'package:lunchx_customer/order_history.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:lunchx_customer/login.dart'; // Import your login screen
+import 'package:lunchx_customer/login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class YourDrawer extends StatefulWidget {
   final Function(bool) onShopStatusChanged;
@@ -17,6 +19,34 @@ class YourDrawer extends StatefulWidget {
 }
 
 class _YourDrawerState extends State<YourDrawer> {
+  late Map<String, dynamic> _userData = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {});
+      await _loadUserData(user.email!); // Pass the user's email here
+    }
+  }
+
+  Future<void> _loadUserData(String email) async {
+    final userData = await FirebaseFirestore.instance
+        .collection('LunchX')
+        .doc('customers')
+        .collection('users')
+        .doc(email)
+        .get();
+    setState(() {
+      _userData = userData.data() as Map<String, dynamic>;
+    });
+  }
+
   Widget _buildDrawerItem(
       BuildContext context, String title, VoidCallback onTap) {
     return GestureDetector(
@@ -80,44 +110,61 @@ class _YourDrawerState extends State<YourDrawer> {
                     ),
                   ),
                   Text(
-                    'Mansi Vora',
+                    _userData['name'] ?? 'N/A',
                     style: GoogleFonts.outfit(
                       fontWeight: FontWeight.w400,
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(height: 10), // Add space between sections
+                  const SizedBox(height: 5), // Add space between sections
 
                   Text(
-                    'Hostel',
+                    'Address',
                     style: GoogleFonts.outfit(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
                   ),
                   Text(
-                    'H.R.H (High Rise)',
+                    _userData['address'] ?? 'N/A',
                     style: GoogleFonts.outfit(
                       fontWeight: FontWeight.w400,
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
 
                   Text(
-                    'Phone Number',
+                    'Email ID',
                     style: GoogleFonts.outfit(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
                   ),
                   Text(
-                    '+91 9408393005',
+                    _userData['email'] ?? 'N/A',
                     style: GoogleFonts.outfit(
                       fontWeight: FontWeight.w400,
                       color: Colors.black,
                     ),
                   ),
+                  const SizedBox(height: 5),
+
+                  Text(
+                    'Phone No.',
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Text(
+                    _userData['phoneNumber'] ?? 'N/A',
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
                 ],
               ),
             ),
