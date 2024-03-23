@@ -116,7 +116,6 @@ class _YourDrawerState extends State<YourDrawer> {
                       color: Colors.black,
                     ),
                   ),
-
                   Text(
                     'Address',
                     style: GoogleFonts.outfit(
@@ -131,7 +130,6 @@ class _YourDrawerState extends State<YourDrawer> {
                       color: Colors.black,
                     ),
                   ),
-
                   Text(
                     'Email ID',
                     style: GoogleFonts.outfit(
@@ -146,7 +144,6 @@ class _YourDrawerState extends State<YourDrawer> {
                       color: Colors.black,
                     ),
                   ),
-
                   Text(
                     'Phone No.',
                     style: GoogleFonts.outfit(
@@ -166,51 +163,6 @@ class _YourDrawerState extends State<YourDrawer> {
             ),
           ),
 
-          const SizedBox(height: 20),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 50.0),
-            height: 100,
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 255, 255, 255),
-              borderRadius: BorderRadius.circular(12.0),
-              border: Border.all(
-                color: Colors.black,
-                width: 2.0,
-              ),
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Saved',
-                    style: GoogleFonts.outfit(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text(
-                    '1 hr 31 mins',
-                    style: GoogleFonts.outfit(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF6552FE),
-                    ),
-                  ),
-                  Text(
-                    'till today!',
-                    style: GoogleFonts.outfit(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
           const SizedBox(
             height: 20,
           ),
