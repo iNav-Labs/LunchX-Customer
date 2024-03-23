@@ -116,7 +116,6 @@ class _YourDrawerState extends State<YourDrawer> {
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(height: 5), // Add space between sections
 
                   Text(
                     'Address',
@@ -132,7 +131,6 @@ class _YourDrawerState extends State<YourDrawer> {
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(height: 5),
 
                   Text(
                     'Email ID',
@@ -148,7 +146,6 @@ class _YourDrawerState extends State<YourDrawer> {
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(height: 5),
 
                   Text(
                     'Phone No.',
@@ -164,7 +161,6 @@ class _YourDrawerState extends State<YourDrawer> {
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(height: 5),
                 ],
               ),
             ),
