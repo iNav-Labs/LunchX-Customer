@@ -1,7 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lunchx_customer/Details/user_registration.dart';
 import 'package:lunchx_customer/login.dart';
 
@@ -15,7 +14,6 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _obscurePassword = true;
 
   @override
@@ -118,12 +116,6 @@ class _SignUpState extends State<SignUp> {
 
   void _registerWithEmailAndPassword(BuildContext context) async {
     try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-
       _showSignUpSuccessDialog(context);
     } catch (e) {
       _showErrorDialog(context, e.toString());

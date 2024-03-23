@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'order_billing.dart';
 
 class CanteenMenuPage extends StatefulWidget {
-  const CanteenMenuPage({super.key});
+  const CanteenMenuPage({super.key, required String userEmail});
 
   @override
   _CanteenMenuPageState createState() => _CanteenMenuPageState();
