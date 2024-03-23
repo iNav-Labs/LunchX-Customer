@@ -272,7 +272,7 @@ class _BodySectionState extends State<BodySection> {
                   width: 94,
                 ),
                 Image.asset(
-                  'assets/thumbnail_burger.png',
+                  'assets/thumbnail_burger.png', // Path to your local asset image
                   height: 200,
                   width: 180,
                   fit: BoxFit.cover,
@@ -323,9 +323,61 @@ class _BodySectionState extends State<BodySection> {
                             child: ListTile(
                               leading: const Icon(Icons.restaurant),
                               title: Text(document['canteenName'] ?? 'N/A'),
-                              subtitle: const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [],
+                              subtitle: FutureBuilder(
+                                future: FirebaseFirestore.instance
+                                    .collection('LunchX')
+                                    .doc('canteens')
+                                    .collection('users')
+                                    .doc(document.id)
+                                    .get(),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<
+                                            DocumentSnapshot<
+                                                Map<String, dynamic>>>
+                                        snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const CircularProgressIndicator();
+                                  }
+                                  if (snapshot.hasError) {
+                                    return Text('Error: ${snapshot.error}');
+                                  }
+                                  if (snapshot.hasData) {
+                                    final canteenData = snapshot.data!.data();
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        //   // Display location if available
+                                        //   Text(
+                                        //     'Location: ${canteenData['location'] ?? 'N/A'}',
+                                        //     style: const TextStyle(
+                                        //       color: Colors.grey,
+                                        //     ),
+                                        //   ),
+                                        //   // Display timings if available
+                                        //   Text(
+                                        //     'Timings: ${canteenData['timings'] ?? 'N/A'}',
+                                        //     style: const TextStyle(
+                                        //       color: Colors.grey,
+                                        //     ),
+                                        //   ),
+                                        // Display image if available
+                                        // Display image if available
+                                        Image.asset(
+                                          canteenData != null
+                                              ? canteenData['imagePath'] ??
+                                                  'assets/default_image.png'
+                                              : 'assets/default_image.png', // Path to your local asset image
+                                          height: 100,
+                                          width: 100,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ],
+                                    );
+                                  }
+                                  return const SizedBox(); // Return an empty widget if there's no data
+                                },
                               ),
                             ),
                           ),
