@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_print, dead_code, unused_local_variable
+// ignore_for_file: library_private_types_in_public_api, avoid_print, dead_code, unused_local_variable, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -155,6 +155,96 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
     if (totalCount == 0) {
       Navigator.pop(context);
     }
+  }
+
+  void confirmOrder(BuildContext context) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    String? userEmail = user?.email;
+
+    if (userEmail != null) {
+      try {
+        // Get the latest order number from Firestore
+        int latestOrderNumber = await getLatestOrderNumber(userEmail);
+
+        // Increment the order number for the new order
+        int orderNumber = latestOrderNumber + 1;
+
+        // Create a new collection reference for the "Current Orders" collection
+        CollectionReference currentOrdersRef = FirebaseFirestore.instance
+            .collection('LunchX')
+            .doc('customers')
+            .collection('users')
+            .doc(userEmail)
+            .collection('Current Orders');
+
+        // Create a new document with the incremented order number
+        DocumentReference orderDocRef =
+            currentOrdersRef.doc('Order #$orderNumber');
+
+        // Map to store cart items
+        Map<String, dynamic> cartItems = {};
+
+        // Add each item from the cart to the cartItems map
+        for (int i = 0; i < order.length; i++) {
+          cartItems['item_$i'] = order[i];
+        }
+
+        // Set the order details inside the document
+        await orderDocRef.set({
+          'orderNumber': orderNumber,
+          'cartItems': cartItems,
+        });
+
+        // Clear the cart collection after moving items to "Current Orders"
+        await FirebaseFirestore.instance
+            .collection('LunchX')
+            .doc('customers')
+            .collection('users')
+            .doc(userEmail)
+            .collection('cart')
+            .get()
+            .then((querySnapshot) {
+          for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+            doc.reference.delete();
+          }
+        });
+
+        // Navigate to the payment success screen or any other screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PaymentSuccess()),
+        );
+      } catch (e) {
+        // Handle any errors that occur
+        print("Error confirming order: $e");
+      }
+    }
+  }
+
+// Function to retrieve the latest order number
+  Future<int> getLatestOrderNumber(String userEmail) async {
+    int latestOrderNumber = 0;
+
+    try {
+      // Retrieve the latest order number from Firestore
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('LunchX')
+          .doc('customers')
+          .collection('users')
+          .doc(userEmail)
+          .collection('Current Orders')
+          .orderBy('orderNumber', descending: true)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        latestOrderNumber = querySnapshot.docs.first['orderNumber'] as int;
+      }
+    } catch (e) {
+      print("Error getting latest order number: $e");
+    }
+
+    return latestOrderNumber;
   }
 
   @override
@@ -529,15 +619,9 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                             const SizedBox(width: 10.0), // Add some spacing
                           ],
                         ),
-
-                        const SizedBox(height: 20),
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const PaymentSuccess()),
-                            );
+                            confirmOrder(context);
                           },
                           child: Center(
                             child: Container(
