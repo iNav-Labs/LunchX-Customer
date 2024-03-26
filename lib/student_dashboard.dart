@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lunchx_customer/Body%20section/body.dart';
-import 'package:lunchx_customer/order_tracking.dart';
 import 'package:lunchx_customer/order_history.dart';
 import 'package:lunchx_customer/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -185,7 +184,7 @@ class _YourDrawerState extends State<YourDrawer> {
             );
           }),
           Container(
-            margin: const EdgeInsets.only(top: 200.0),
+            margin: const EdgeInsets.only(top: 300.0),
             child: Image.asset(
               'assets/logo2.png', // Adjust the path accordingly
               height: 50.0,
@@ -237,56 +236,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Image.asset(
-                    'assets/logo2.png',
-                    width: 110.0,
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const OrderTracker()),
-                    );
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6552FE),
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12.0, vertical: 6.0),
-                    child: Image.asset(
-                      'assets/notify.gif',
-                      width: 25,
-                      height: 25,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Image.asset(
+                'assets/logo2.png',
+                width: 100.0,
+              ),
+            ],
+          ),
         ),
       ),
       endDrawer: YourDrawer(
         onShopStatusChanged: (status) {
-          // NULL
+          setState(() {
+            isShopOpen = status; // Update the shop status
+          });
         },
       ),
       body: const BodySection(),
     );
   }
 }
-// No changes in the code
+// Do not change in the code

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lunchx_customer/student_dashboard.dart';
 
 class OrderTracker extends StatefulWidget {
   const OrderTracker({super.key});
@@ -35,8 +36,16 @@ class _OrderTrackerState extends State<OrderTracker> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            // Navigate back to the original main screen
+            // Pop all routes until reaching the first route
             Navigator.popUntil(context, (route) => route.isFirst);
+
+            // Push the student_dashboard screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DashboardScreen(),
+              ),
+            );
           },
         ),
       ),

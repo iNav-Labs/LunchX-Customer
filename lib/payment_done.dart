@@ -47,9 +47,7 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
             colors: [
               Color(0xFF6CB65A), // Green
               Color(0xFF6CB65A), // Greens
-
               Color(0xFF6552FE), // Purple
-
               Color(0xFF6552FE), // Purple
             ],
             stops: [0, 1 / 3, 2 / 3, 1],
@@ -59,80 +57,35 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 60),
-              RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  text: 'Success Payment',
-                  style: GoogleFonts.outfit(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 30.0,
-                  ),
+              const SizedBox(height: 40),
+              Text(
+                'Payment Successful',
+                style: GoogleFonts.outfit(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 30.0,
                 ),
               ),
-              const SizedBox(
-                  height: 120), // Add some space between text and image
+              const SizedBox(height: 20), // Add space between text and image
               Image.asset(
-                '/Users/agro/development/trail/pox/lib/assets/images/clocky.gif', // Replace with the path to your logo image
-                width: 200, // Adjust the width as needed
-                height: 200, // Adjust the height as needed
-              ),
-              const SizedBox(
-                height: 40,
-              ),
-              RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  text: 'Saved',
-                  style: GoogleFonts.outfit(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 18.0,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: ' 30-35 minutes,\n',
-                      style: GoogleFonts.outfit(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 24.0,
-                      ),
-                    ),
-                    TextSpan(
-                      text: ' sunstroke-free.',
-                      style: GoogleFonts.outfit(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 18.0,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(
+                'assets/clocky.gif',
+                width: 200,
                 height: 200,
               ),
-
-              Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Made with Love',
-                      style: GoogleFonts.outfit(
-                        color: Colors.white,
-                        fontSize: 14,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    Image.asset(
-                      'assets/logo.png', // Replace with the path to your logo image
-                      width: 120, // Adjust the width as needed
-                      height: 120, // Adjust the height as needed
-                    ),
-                  ],
+              const SizedBox(height: 20), // Add space between image and text
+              Text(
+                'Your order has been successfully placed!',
+                style: GoogleFonts.outfit(
+                  color: Colors.white,
+                  fontSize: 20,
                 ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40), // Add space between text and logo
+              Image.asset(
+                'assets/logo.png',
+                width: 120,
+                height: 120,
               ),
             ],
           ),

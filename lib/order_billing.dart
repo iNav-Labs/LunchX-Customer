@@ -1,8 +1,10 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_unnecessary_containers, avoid_print, dead_code
+// ignore_for_file: library_private_types_in_public_api, avoid_print, dead_code, unused_local_variable
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'payment_done.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:lunchx_customer/payment_done.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class OrderBillingScreen extends StatefulWidget {
   const OrderBillingScreen({super.key});
@@ -12,23 +14,148 @@ class OrderBillingScreen extends StatefulWidget {
 }
 
 class _OrderBillingScreenState extends State<OrderBillingScreen> {
-  List<Map<String, dynamic>> order = [
-    {
-      'name': 'Veg Burger',
-      'quantity': 3,
-      'price': 79,
-    },
-    {
-      'name': 'Chicken Burger',
-      'quantity': 1,
-      'price': 89,
-    },
-    {
-      'name': 'Pizza',
-      'quantity': 2,
-      'price': 129,
-    },
-  ];
+  List<Map<String, dynamic>> order = [];
+  late User _currentUser;
+  bool isDineSelected = true; // Initial selection is DINE
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUser();
+    fetchOrderData();
+  }
+
+  double calculateTotalPrice(List<Map<String, dynamic>> order) {
+    double totalPrice = 0.0;
+    for (var item in order) {
+      totalPrice += item['price'] * item['count'];
+    }
+    return totalPrice;
+  }
+
+  double calculateParcelCost(List<Map<String, dynamic>> order) {
+    double parcelCost = 0.0;
+    for (var item in order) {
+      if (item['service'] == 'PARCEL') {
+        parcelCost += 10 * item['count'];
+      }
+    }
+    return parcelCost;
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        _currentUser = user;
+        void userEmail = _currentUser.email;
+        print(_currentUser.email);
+      });
+      // await _loadUserData();
+    }
+  }
+
+  // Fetch order data from Firestore
+  Future<void> fetchOrderData() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      String? userEmail = user?.email;
+
+      if (userEmail != null) {
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('LunchX')
+            .doc('customers')
+            .collection('users')
+            .doc(userEmail)
+            .collection('cart')
+            .get();
+
+        List<Map<String, dynamic>> fetchedOrderList = [];
+        for (var doc in querySnapshot.docs) {
+          fetchedOrderList.add(doc.data() as Map<String, dynamic>);
+        }
+
+        setState(() {
+          order = fetchedOrderList;
+        });
+      }
+    } catch (e) {
+      // Handle any errors that occur
+    }
+  }
+
+  // Increment item count and update Firestore
+  void incrementItemCount(int index) async {
+    setState(() {
+      order[index]['count']++;
+    });
+    User? user = FirebaseAuth.instance.currentUser;
+    String? userEmail = user?.email;
+    if (userEmail != null) {
+      FirebaseFirestore.instance
+          .collection('LunchX')
+          .doc('customers')
+          .collection('users')
+          .doc(userEmail)
+          .collection('cart')
+          .doc(order[index]['name']) // Use 'name' as the unique identifier
+          .set({'count': order[index]['count']}, SetOptions(merge: true))
+          .then((value) => print("Item count updated in Firestore"))
+          .catchError((error) => print("Failed to update item count: $error"));
+    }
+  }
+
+  // Decrement item count and update Firestore, remove item if count is 0
+  void decrementItemCount(int index, BuildContext context) async {
+    setState(() {
+      if (order[index]['count'] > 0) {
+        order[index]['count']--;
+      } else {
+        order.removeAt(index);
+      }
+    });
+
+    User? user = FirebaseAuth.instance.currentUser;
+    String? userEmail = user?.email;
+
+    if (userEmail != null) {
+      if (order[index]['count'] != 0) {
+        FirebaseFirestore.instance
+            .collection('LunchX')
+            .doc('customers')
+            .collection('users')
+            .doc(userEmail)
+            .collection('cart')
+            .doc(order[index]['name']) // Use 'name' as the unique identifier
+            .set({'count': order[index]['count']}, SetOptions(merge: true))
+            .then((value) => print("Item count updated in Firestore"))
+            .catchError(
+                (error) => print("Failed to update item count: $error"));
+      } else {
+        FirebaseFirestore.instance
+            .collection('LunchX')
+            .doc('customers')
+            .collection('users')
+            .doc(userEmail)
+            .collection('cart')
+            .doc(order[index]['name']) // Use 'name' as the unique identifier
+            .delete()
+            .then((value) => print("Item removed from Firestore"))
+            .catchError((error) => print("Failed to remove item: $error"));
+      }
+    }
+
+    // Calculate total count of items
+    int totalCount = 0;
+    for (var item in order) {
+      totalCount += item['count'] as int;
+    }
+
+    // If total count is zero, navigate back to previous screen
+    if (totalCount == 0) {
+      Navigator.pop(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,74 +209,72 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
 
                         // Dynamically build containers based on order list
                         for (int i = 0; i < order.length; i++)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: cardWidth / 2 +
-                                    15, // Half of the card's width
-                                height: 35.0,
-                                color: Colors.white,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 1.0),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      order[i]['name'],
-                                      style: GoogleFonts.outfit(
-                                        color: Colors.black,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.w500,
+                          if (order[i]['count'] > 0)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: cardWidth / 2 +
+                                      15, // Half of the card's width
+                                  height: 35.0,
+                                  color: Colors.white,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 1.0),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        order[i]['name'],
+                                        style: GoogleFonts.outfit(
+                                          color: Colors.black,
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                width: cardWidth / 4 - 40,
-                                height: 25.0,
-                                decoration: BoxDecoration(
-                                  color: const Color.fromARGB(255, 255, 255, 255),
-                                  borderRadius: BorderRadius.circular(15.0),
-                                  border: Border.all(
-                                    color: Colors.black,
-                                    width: 2.0,
+                                Container(
+                                  width: cardWidth / 4 - 40,
+                                  height: 25.0,
+                                  decoration: BoxDecoration(
+                                    color: const Color.fromARGB(
+                                        255, 255, 255, 255),
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    border: Border.all(
+                                      color: Colors.black,
+                                      width: 2.0,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'Rs. ${order[i]['price']}',
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.outfit(
+                                          color: Colors.black,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    'Rs. ${order[i]['price']}',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.outfit(
-                                        color: Colors.black,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
 
-                              const SizedBox(width: 10.0), // Add some spacing
-                              Container(
-                                width: cardWidth / 3 -
-                                    60.0, // One-third of the card's width
-                                height: 25.0,
-                                padding: const EdgeInsets.symmetric(horizontal: 5),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF6552FE),
-                                  borderRadius: BorderRadius.circular(15.0),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          if (order[i]['quantity'] > 1) {
-                                            order[i]['quantity']--;
-                                          }
-                                        });
-                                      },
-                                      child: Container(
+                                const SizedBox(width: 10.0), // Add some spacing
+                                Container(
+                                  width: cardWidth / 3 -
+                                      60.0, // One-third of the card's width
+                                  height: 25.0,
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF6552FE),
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          decrementItemCount(i, context);
+                                        },
                                         child: const Center(
                                           child: Icon(
                                             Icons.remove,
@@ -158,25 +283,21 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    Container(
-                                      margin:
-                                          const EdgeInsets.symmetric(horizontal: 5),
-                                      child: Text(
-                                        '${order[i]['quantity']}',
-                                        style: GoogleFonts.outfit(
-                                          color: Colors.white,
-                                          fontSize: 14,
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 5),
+                                        child: Text(
+                                          '${order[i]['count']}',
+                                          style: GoogleFonts.outfit(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          order[i]['quantity']++;
-                                        });
-                                      },
-                                      child: Container(
+                                      GestureDetector(
+                                        onTap: () {
+                                          incrementItemCount(i);
+                                        },
                                         child: const Center(
                                           child: Icon(
                                             Icons.add,
@@ -185,154 +306,16 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-
-                        const SizedBox(height: 20),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isDineSelected = true;
-                              print('DINE choosed');
-                            });
-                          },
-                          child: Center(
-                            child: Container(
-                              height: 30.0,
-                              width: 150,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color: const Color(0xFF6552FE),
-                                  width: 2.0,
-                                ),
-                                borderRadius: BorderRadius.circular(20.0),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    spreadRadius: 2,
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 2),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              child: Center(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          isDineSelected = true;
-                                          print('DINE choosed');
-                                        });
-                                      },
-                                      child: Container(
-                                        width: 70,
-                                        padding:
-                                            const EdgeInsets.only(top: 2, bottom: 2),
-                                        decoration: BoxDecoration(
-                                          color: isDineSelected
-                                              ? Colors.white
-                                              : const Color(0xFF6552FE),
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: Text(
-                                          'DINE',
-                                          style: GoogleFonts.outfit(
-                                            color: isDineSelected
-                                                ? const Color(0xFF6552FE)
-                                                : Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 12.0,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          isDineSelected = false;
-                                          print('PARCEL choosed');
-                                        });
-                                      },
-                                      child: Container(
-                                        width: 70,
-                                        padding:
-                                            const EdgeInsets.only(top: 2, bottom: 2),
-                                        decoration: BoxDecoration(
-                                          color: isDineSelected
-                                              ? const Color(0xFF6552FE)
-                                              : Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: Text(
-                                          'PARCEL',
-                                          style: GoogleFonts.outfit(
-                                            color: isDineSelected
-                                                ? Colors.white
-                                                : const Color(0xFF6552FE),
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 12.0,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
                                 ),
-                              ),
+                              ],
                             ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Text.rich(
-              TextSpan(
-                text: 'Unlock ',
-                style: GoogleFonts.outfit(
-                  color: Colors.black54,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 18.0,
-                ),
-                children: [
-                  TextSpan(
-                    text: '32 mins',
-                    style: GoogleFonts.outfit(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 20.0,
-                    ),
-                  ),
-                  TextSpan(
-                    text: ' of saved time now!',
-                    style: GoogleFonts.outfit(
-                      color: Colors.black54,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 18.0,
-                    ),
-                  ),
-                ],
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(
-              height: 20,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -400,11 +383,11 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                               ),
                               child: Center(
                                 child: Text(
-                                  'Rs. 120 /-',
+                                  'Rs. ${calculateTotalPrice(order).toStringAsFixed(2)} /-',
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.outfit(
                                     color: Colors.black,
-                                    fontSize: 18,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w300,
                                   ),
                                 ),
@@ -445,11 +428,11 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                               ),
                               child: Center(
                                 child: Text(
-                                  'Rs. 10 /-',
+                                  'Rs. ${calculateParcelCost(order).toStringAsFixed(2)} /-',
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.outfit(
                                     color: Colors.black,
-                                    fontSize: 18,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w300,
                                   ),
                                 ),
@@ -503,8 +486,50 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                             const SizedBox(width: 10.0), // Add some spacing
                           ],
                         ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: cardWidth / 2 +
+                                  25, // Half of the card's width
+                              height: 35.0,
+                              color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 1.0),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Total Amount',
+                                    style: GoogleFonts.outfit(
+                                      color: Colors.black,
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: cardWidth / 3 - 10,
+                              decoration: const BoxDecoration(
+                                color: Color.fromARGB(255, 255, 255, 255),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Rs. ${(calculateTotalPrice(order) + calculateParcelCost(order)).toStringAsFixed(2)} /-',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.outfit(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
 
-// **************************************************************************************************
+                            const SizedBox(width: 10.0), // Add some spacing
+                          ],
+                        ),
+
                         const SizedBox(height: 20),
                         GestureDetector(
                           onTap: () {
@@ -597,3 +622,4 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
     );
   }
 }
+// Do not change in the code
