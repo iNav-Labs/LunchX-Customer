@@ -3,10 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lunchx_customer/Body%20section/body.dart';
+import 'package:lunchx_customer/order_billing.dart';
 import 'package:lunchx_customer/order_history.dart';
 import 'package:lunchx_customer/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:lunchx_customer/order_tracking.dart';
 
 class YourDrawer extends StatefulWidget {
   final Function(bool) onShopStatusChanged;
@@ -244,6 +246,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Image.asset(
                 'assets/logo2.png',
                 width: 100.0,
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OrderTracker(),
+                    ),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6552FE),
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.asset(
+                    'assets/notify.gif',
+                    width: 30,
+                    height: 30,
+                  ),
+                ),
               ),
             ],
           ),
