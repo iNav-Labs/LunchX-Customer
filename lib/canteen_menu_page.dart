@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_print, avoid_types_as_parameter_names
+// ignore_for_file: library_private_types_in_public_api, avoid_print, avoid_types_as_parameter_names, use_build_context_synchronously
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -29,8 +29,39 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
     _loadCurrentUser();
     fetchOrderData();
     _loadUserData();
-
     localItemCountMap = Map.from(itemCountMap); // Initialize with existing data
+  }
+
+  @override
+  void dispose() {
+    if (itemCountMap.isNotEmpty) {
+      // Prevent users from going back if items folder is not empty
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Confirmation'),
+            content: const Text('Are you sure you want to leave?'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Leave'),
+              ),
+            ],
+          ),
+        );
+      });
+    }
+    super.dispose();
   }
 
   Future<void> fetchOrderData() async {
@@ -66,8 +97,8 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
     if (user != null) {
       setState(() {
         _currentUser = user;
-        print(_currentUser.email);
-        print(widget.userEmail);
+        // print(_currentUser.email);
+        // print(widget.userEmail);
       });
       await _loadUserData();
     }
@@ -83,6 +114,53 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (itemCountMap.isNotEmpty) {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Clear Cart?'),
+                  content: const Text(
+                      'You can only order from one canteen at a time. Clear your cart?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('No'),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        // Delete all documents inside the "items" collection for the current user
+                        await FirebaseFirestore.instance
+                            .collection('LunchX')
+                            .doc('customers')
+                            .collection('users')
+                            .doc(_currentUser.email)
+                            .collection('cart')
+                            .get()
+                            .then((querySnapshot) {
+                          for (var doc in querySnapshot.docs) {
+                            doc.reference.delete();
+                          }
+                        });
+
+                        // Navigate back
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Yes'),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              Navigator.of(context).pop();
+            }
+          },
+        ),
       ),
       body: Column(
         children: [
@@ -311,8 +389,13 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
                                                             'count': count,
                                                             'price':
                                                                 item['price'],
-                                                            // 'canteen':
-                                                            //     canteenName,
+                                                            'packageprice': item[
+                                                                'packageprice'],
+                                                            'timeofPreparation':
+                                                                item[
+                                                                    'timeofPreparation'],
+                                                            'canteen': item[
+                                                                'canteenName'],
                                                           })
                                                           .then((_) => print(
                                                               'Item stored in database'))

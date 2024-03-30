@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lunchx_customer/splash_screen.dart';
+import 'package:lunchx_customer/student_dashboard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,10 +15,28 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+    return StreamBuilder(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator(); // or a loading widget
+        } else {
+          if (snapshot.hasData && snapshot.data != null) {
+            // User is logged in, navigate to your home screen
+            return const MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home:
+                  DashboardScreen(), // Replace HomeScreen with your actual home screen
+            );
+          } else {
+            // User is not logged in, navigate to login screen
+            return const MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home: SplashScreen(),
+            );
+          }
+        }
+      },
     );
   }
 }
-// Do not change in the code

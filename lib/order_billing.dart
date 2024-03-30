@@ -17,6 +17,7 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
   List<Map<String, dynamic>> order = [];
   late User _currentUser;
   bool isDineSelected = true; // Initial selection is DINE
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -28,7 +29,7 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
   double calculateTotalPrice(List<Map<String, dynamic>> order) {
     double totalPrice = 0.0;
     for (var item in order) {
-      totalPrice += item['price'] * item['count'];
+      totalPrice += (item['price'] + item['packageprice']) * item['count'];
     }
     return totalPrice;
   }
@@ -36,9 +37,7 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
   double calculateParcelCost(List<Map<String, dynamic>> order) {
     double parcelCost = 0.0;
     for (var item in order) {
-      if (item['service'] == 'PARCEL') {
-        parcelCost += 10 * item['count'];
-      }
+      parcelCost += item['packageprice'] * item['count'];
     }
     return parcelCost;
   }
@@ -157,72 +156,192 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
     }
   }
 
+  Future<String?> getUserNameFromEmail(String? userEmail) async {
+    if (userEmail == null) return null;
+
+    try {
+      // Query Firestore to find the user's name using the provided email
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('LunchX')
+              .doc('customers')
+              .collection('users')
+              .where('email', isEqualTo: userEmail)
+              .limit(1)
+              .get();
+
+      // If user with provided email is found, return their name
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.first['name'] as String?;
+      }
+    } catch (e) {
+      print("Error retrieving user's name: $e");
+    }
+
+    // Return null if user's name is not found
+    return null;
+  }
+
+  Future<String?> getCanteenOwnerEmail(String canteenName) async {
+    try {
+      // Get the reference to the 'users' collection under 'canteens' in 'LunchX'
+      CollectionReference usersCollectionRef = FirebaseFirestore.instance
+          .collection('LunchX')
+          .doc('canteens')
+          .collection('users');
+
+      // Fetch all documents from the 'users' collection
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await usersCollectionRef.get() as QuerySnapshot<Map<String, dynamic>>;
+
+      // Iterate through each document to find a match for canteenName
+      for (QueryDocumentSnapshot<Map<String, dynamic>> userDoc
+          in querySnapshot.docs) {
+        // Get the canteen name from the current document
+        String? canteenDocName = userDoc.data()['canteenName'] as String?;
+
+        // If the canteen name matches the provided canteenName, return the owner's email
+        if (canteenDocName == canteenName) {
+          return userDoc.data()['email'] as String?;
+        }
+      }
+    } catch (e) {
+      print("Error retrieving canteen owner's email: $e");
+    }
+
+    // Return null if canteen owner's email is not found
+    return null;
+  }
+
   void confirmOrder(BuildContext context) async {
     User? user = FirebaseAuth.instance.currentUser;
+    print(user);
     String? userEmail = user?.email;
+    setState(() {
+      isLoading = true;
+    });
 
     if (userEmail != null) {
-      try {
-        // Get the latest order number from Firestore
-        int latestOrderNumber = await getLatestOrderNumber(userEmail);
+      String? userName = await getUserNameFromEmail(userEmail);
 
-        // Increment the order number for the new order
-        int orderNumber = latestOrderNumber + 1;
+      if (userName != null) {
+        try {
+          // Get the latest order number from Firestore
+          int latestOrderNumber = await getLatestOrderNumber();
+          print('$latestOrderNumber is the latest order number.');
 
-        // Create a new collection reference for the "Current Orders" collection
-        CollectionReference currentOrdersRef = FirebaseFirestore.instance
-            .collection('LunchX')
-            .doc('customers')
-            .collection('users')
-            .doc(userEmail)
-            .collection('Current Orders');
+          // Increment the order number for the new order
+          int orderNumber = latestOrderNumber + 1;
+          print('$orderNumber is the new order number.');
 
-        // Create a new document with the incremented order number
-        DocumentReference orderDocRef =
-            currentOrdersRef.doc('Order #$orderNumber');
+          // Map to store cart items
+          List<Map<String, dynamic>> cartItemsList = [];
 
-        // Map to store cart items
-        Map<String, dynamic> cartItems = {};
-
-        // Add each item from the cart to the cartItems map
-        for (int i = 0; i < order.length; i++) {
-          cartItems['item_$i'] = order[i];
-        }
-
-        // Set the order details inside the document
-        await orderDocRef.set({
-          'orderNumber': orderNumber,
-          'cartItems': cartItems,
-        });
-
-        // Clear the cart collection after moving items to "Current Orders"
-        await FirebaseFirestore.instance
-            .collection('LunchX')
-            .doc('customers')
-            .collection('users')
-            .doc(userEmail)
-            .collection('cart')
-            .get()
-            .then((querySnapshot) {
-          for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-            doc.reference.delete();
+          // Add each item from the cart to the cartItemsList
+          for (int i = 0; i < order.length; i++) {
+            cartItemsList.add({
+              'canteen': order[i]['canteen'],
+              'count': order[i]['count'],
+              'name': order[i]['name'],
+              'price': order[i]['price'],
+            });
           }
-        });
 
-        // Navigate to the payment success screen or any other screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const PaymentSuccess()),
-        );
-      } catch (e) {
-        // Handle any errors that occur
-        print("Error confirming order: $e");
+          // Set the order details
+          Map<String, dynamic> orderDetails = {
+            'orderNumber': orderNumber,
+            'userName': userName,
+            'cartItems': cartItemsList,
+            'totalPrice': calculateTotalPrice(order),
+            'accept?': 'pending',
+            'cooking': true,
+            'dispatch': false,
+            'ready': false,
+            'time': 4,
+            'email': userEmail,
+          };
+
+          // Store order details in the "canteen_orders_queue" collection in Firestore
+          CollectionReference canteenOrdersRef = FirebaseFirestore.instance
+              .collection('LunchX')
+              .doc('customers')
+              .collection('canteen_orders_queue');
+
+          // Store order details in the "canteen_orders_queue" collection
+          await canteenOrdersRef.doc('Order #$orderNumber').set(orderDetails);
+
+          // Store order details in the "current_order" collection in Firestore for the user
+          CollectionReference currentUserOrdersRef = FirebaseFirestore.instance
+              .collection('LunchX')
+              .doc('customers')
+              .collection('users')
+              .doc(userEmail)
+              .collection('current_orders');
+
+// Store order details in the "current_order" collection
+          await currentUserOrdersRef
+              .doc('Order #$orderNumber')
+              .set(orderDetails);
+
+          // Send order details to canteen owner's folder based on canteen name
+          for (var cartItem in cartItemsList) {
+            print('canteen name is ${cartItem['canteen']}');
+            String? canteenOwnerEmail =
+                await getCanteenOwnerEmail(cartItem['canteen']);
+
+            print('canteen owner email $canteenOwnerEmail');
+
+            if (canteenOwnerEmail != null) {
+              try {
+                CollectionReference canteenOwnerOrdersRef = FirebaseFirestore
+                    .instance
+                    .collection('LunchX')
+                    .doc('canteens')
+                    .collection('users')
+                    .doc(canteenOwnerEmail)
+                    .collection('present_orders');
+
+                // Store order details in canteen owner's folder
+                await canteenOwnerOrdersRef
+                    .doc('Order #$orderNumber')
+                    .set(orderDetails);
+              } catch (e) {
+                print(
+                    "Error storing order details in canteen owner's folder: $e");
+              }
+            }
+          }
+          // Clear the cart collection after moving items to "Current Orders"
+          await FirebaseFirestore.instance
+              .collection('LunchX')
+              .doc('customers')
+              .collection('users')
+              .doc(userEmail)
+              .collection('cart')
+              .get()
+              .then((querySnapshot) {
+            for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+              doc.reference.delete();
+            }
+          });
+
+          // Navigate to the payment success screen or any other screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const PaymentSuccess()),
+          );
+        } catch (e) {
+          // Handle any errors that occur
+          print("Error confirming order: $e");
+        }
+      } else {
+        print("Error: User name not found for email: $userEmail");
       }
     }
   }
 
 // Function to retrieve the latest order number
-  Future<int> getLatestOrderNumber(String userEmail) async {
+  Future<int> getLatestOrderNumber() async {
     int latestOrderNumber = 0;
 
     try {
@@ -230,9 +349,7 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('LunchX')
           .doc('customers')
-          .collection('users')
-          .doc(userEmail)
-          .collection('Current Orders')
+          .collection('canteen_orders_queue')
           .orderBy('orderNumber', descending: true)
           .limit(1)
           .get();
@@ -640,14 +757,32 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                                 ],
                               ),
                               child: Center(
-                                child: Text(
-                                  'Confirm Order',
-                                  style: GoogleFonts.outfit(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14.0,
+                                child: SizedBox(
+                                  height: 40.0,
+                                  child: Stack(
+                                    children: [
+                                      isLoading
+                                          ? const Center(
+                                              child: CircularProgressIndicator(
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<
+                                                        Color>(Colors.white),
+                                                strokeWidth: 2.0,
+                                              ),
+                                            )
+                                          : Center(
+                                              child: Text(
+                                                'Confirm Order',
+                                                style: GoogleFonts.outfit(
+                                                  color: Colors.white,
+                                                  fontSize: 14.0,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                    ],
                                   ),
-                                  textAlign: TextAlign.center,
                                 ),
                               ),
                             ),

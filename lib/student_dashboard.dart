@@ -171,11 +171,14 @@ class _YourDrawerState extends State<YourDrawer> {
 
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => OrderHistoryScreen()),
+              MaterialPageRoute(
+                  builder: (context) => const OrderHistoryScreen()),
             );
           }),
           _buildDrawerItem(context, 'Logout', () {
             // Perform logout
+            FirebaseAuth.instance.signOut();
+
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(

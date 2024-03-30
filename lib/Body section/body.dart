@@ -152,7 +152,7 @@ class _BodySectionState extends State<BodySection> {
                                               topLeft: Radius.circular(15),
                                               topRight: Radius.circular(15),
                                             ),
-                                            child: Image.asset(
+                                            child: Image.network(
                                               imagePath,
                                               fit: BoxFit
                                                   .cover, // Ensure the image is fully visible without distortion
