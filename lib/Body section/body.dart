@@ -117,7 +117,8 @@ class _BodySectionState extends State<BodySection> {
                                   SizedBox(
                                     width: double.infinity, // Take full width
                                     height: 120, // Set desired height
-                                    child: FutureBuilder(
+                                    child: FutureBuilder<
+                                        DocumentSnapshot<Map<String, dynamic>>>(
                                       future: FirebaseFirestore.instance
                                           .collection('LunchX')
                                           .doc('canteens')
@@ -131,38 +132,63 @@ class _BodySectionState extends State<BodySection> {
                                               snapshot) {
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
+                                          // While data is loading, show a loading indicator
                                           return const Center(
                                             child: CircularProgressIndicator(),
                                           );
                                         }
                                         if (snapshot.hasError) {
+                                          // If there's an error fetching data, display the error message
                                           return Text(
                                               'Error: ${snapshot.error}');
                                         }
-                                        if (snapshot.hasData) {
+                                        if (snapshot.hasData &&
+                                            snapshot.data!.exists) {
+                                          // If data is available and the document exists
                                           final canteenData =
-                                              snapshot.data!.data();
-                                          final imagePath = canteenData != null
-                                              ? canteenData['imagePath'] ??
-                                                  'assets/default_image.png'
-                                              : 'assets/default_image.png';
-                                          return ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                              topLeft: Radius.circular(15),
-                                              topRight: Radius.circular(15),
-                                            ),
-                                            child: Image.network(
-                                              imagePath,
-                                              fit: BoxFit
-                                                  .cover, // Ensure the image is fully visible without distortion
-                                            ),
-                                          );
+                                              snapshot.data!.data()!;
+                                          final imagePath =
+                                              canteenData['imagePath'];
+
+                                          if (imagePath != null &&
+                                              imagePath.isNotEmpty) {
+                                            // If imagePath is valid, display the image
+                                            return ClipRRect(
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                topLeft: Radius.circular(15),
+                                                topRight: Radius.circular(15),
+                                              ),
+                                              child: Image.network(
+                                                imagePath,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  print(
+                                                      'Error loading image: $error');
+                                                  print(
+                                                      'Image URL: $imagePath');
+                                                  return const Text(
+                                                      'Error loading image');
+                                                },
+                                              ),
+                                            );
+                                          } else {
+                                            // If imagePath is null or empty, display a placeholder or default image
+                                            print(
+                                                'Warning: Image path is null or empty');
+                                            return const Placeholder(); // You can replace this with your default image widget
+                                          }
+                                        } else {
+                                          // If the document does not exist, display a warning
+                                          print(
+                                              'Warning: Document does not exist');
+                                          return const SizedBox();
                                         }
-                                        return const SizedBox();
                                       },
                                     ),
                                   ),
+
                                   Padding(
                                     padding: const EdgeInsets.all(12.0),
                                     child: Column(

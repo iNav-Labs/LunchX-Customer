@@ -252,7 +252,7 @@ class OrderDetailsCard extends StatelessWidget {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    '${order['cartItems'][0]['canteen']}', // Assuming you want to display the canteen of the first item in cartItems
+                                    '${order['cartItems'] != null && order['cartItems'].isNotEmpty ? order['cartItems'][0]['canteen'] ?? 'Unknown' : 'Unknown'}', // Assuming you want to display the canteen of the first item in cartItems
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.outfit(
                                       color: Colors.black,
@@ -406,8 +406,8 @@ class OrderDetailsCard extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
-                                    width: 170,
-                                    height: 170,
+                                    width: 155,
+                                    height: 155,
                                     margin: const EdgeInsets.symmetric(
                                         horizontal: 10),
                                     decoration: BoxDecoration(
@@ -448,8 +448,8 @@ class OrderDetailsCard extends StatelessWidget {
                                     ),
                                   ),
                                   Container(
-                                    width: 170,
-                                    height: 170,
+                                    width: 155,
+                                    height: 155,
                                     margin: const EdgeInsets.symmetric(
                                         horizontal: 10),
                                     decoration: BoxDecoration(

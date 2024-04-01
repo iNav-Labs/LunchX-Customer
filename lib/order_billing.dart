@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_print, dead_code, unused_local_variable, use_build_context_synchronously
+// ignore_for_file: library_private_types_in_public_api, avoid_print, dead_code, unused_local_variable, use_build_context_synchronously, sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -366,22 +366,21 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double cardWidth =
-        MediaQuery.of(context).size.width - 20.0; // Full width of the card
+    double screenWidth = MediaQuery.of(context).size.width;
+    double cardWidth = screenWidth - 20.0;
     bool isDineSelected = true;
 
     return Scaffold(
       appBar: AppBar(
-          // Your app bar content goes here
-          ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Card(
+        title: const Text('Order Billing'),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Card(
                 elevation: 5,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
@@ -412,19 +411,15 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                             color: const Color(0xFF6552FE),
                           ),
                         ),
-                        const SizedBox(height: 10.0), // Add some spacing
-
-                        // Dynamically build containers based on order list
+                        const SizedBox(height: 10.0),
                         for (int i = 0; i < order.length; i++)
                           if (order[i]['count'] > 0)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Container(
-                                  width: cardWidth / 2 +
-                                      15, // Half of the card's width
-                                  height: 35.0,
-                                  color: Colors.white,
+                                SizedBox(
+                                  width: cardWidth / 2 - 70,
+                                  height: 25,
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 1.0),
                                     child: Align(
@@ -440,9 +435,10 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                                     ),
                                   ),
                                 ),
+                                const SizedBox(width: 40.0),
                                 Container(
-                                  width: cardWidth / 4 - 40,
-                                  height: 25.0,
+                                  width: cardWidth / 4 - 20,
+                                  height: 20.0,
                                   decoration: BoxDecoration(
                                     color: const Color.fromARGB(
                                         255, 255, 255, 255),
@@ -463,12 +459,11 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                                     ),
                                   ),
                                 ),
-
-                                const SizedBox(width: 10.0), // Add some spacing
+                                const SizedBox(width: 10.0),
                                 Container(
-                                  width: cardWidth / 3 -
-                                      60.0, // One-third of the card's width
-                                  height: 25.0,
+                                  width: MediaQuery.of(context).size.width / 3 -
+                                      60.0,
+                                  height: 20.0,
                                   padding:
                                       const EdgeInsets.symmetric(horizontal: 5),
                                   decoration: BoxDecoration(
@@ -486,7 +481,7 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                                           child: Icon(
                                             Icons.remove,
                                             color: Colors.white,
-                                            size: 18.0,
+                                            size: 14.0,
                                           ),
                                         ),
                                       ),
@@ -509,12 +504,18 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                                           child: Icon(
                                             Icons.add,
                                             color: Colors.white,
-                                            size: 18.0,
+                                            size: 14.0,
                                           ),
                                         ),
                                       ),
+
+                                      // Add a spacer to distribute remaining space
+                                      // Spacer(),
                                     ],
                                   ),
+                                ),
+                                const SizedBox(
+                                  height: 10.0,
                                 ),
                               ],
                             ),
@@ -523,10 +524,7 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Card(
+              Card(
                 elevation: 5,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
@@ -557,17 +555,12 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                             color: const Color(0xFF6552FE),
                           ),
                         ),
-                        const SizedBox(height: 10.0), // Add some spacing
-
-                        // Dynamically build containers based on order list
+                        const SizedBox(height: 10.0),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              width: cardWidth / 2 +
-                                  25, // Half of the card's width
-                              height: 35.0,
-                              color: Colors.white,
+                            SizedBox(
+                              width: cardWidth / 2 + 25,
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 1.0),
                                 child: Align(
@@ -585,9 +578,6 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                             ),
                             Container(
                               width: cardWidth / 3 - 10,
-                              decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 255, 255, 255),
-                              ),
                               child: Center(
                                 child: Text(
                                   'Rs. ${calculateTotalPrice(order).toStringAsFixed(2)} /-',
@@ -600,19 +590,14 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                                 ),
                               ),
                             ),
-
-                            const SizedBox(width: 10.0), // Add some spacing
                           ],
                         ),
-
+                        const SizedBox(height: 10.0),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              width: cardWidth / 2 +
-                                  25, // Half of the card's width
-                              height: 35.0,
-                              color: Colors.white,
+                            SizedBox(
+                              width: cardWidth / 2 + 25,
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 1.0),
                                 child: Align(
@@ -630,9 +615,6 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                             ),
                             Container(
                               width: cardWidth / 3 - 10,
-                              decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 255, 255, 255),
-                              ),
                               child: Center(
                                 child: Text(
                                   'Rs. ${calculateParcelCost(order).toStringAsFixed(2)} /-',
@@ -645,18 +627,14 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                                 ),
                               ),
                             ),
-
-                            const SizedBox(width: 10.0), // Add some spacing
                           ],
                         ),
+                        const SizedBox(height: 10.0),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              width: cardWidth / 2 +
-                                  25, // Half of the card's width
-                              height: 35.0,
-                              color: Colors.white,
+                            SizedBox(
+                              width: cardWidth / 2 + 25,
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 1.0),
                                 child: Align(
@@ -674,9 +652,6 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                             ),
                             Container(
                               width: cardWidth / 3 - 10,
-                              decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 255, 255, 255),
-                              ),
                               child: Center(
                                 child: Text(
                                   'Rs. 0 /-',
@@ -689,18 +664,14 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                                 ),
                               ),
                             ),
-
-                            const SizedBox(width: 10.0), // Add some spacing
                           ],
                         ),
+                        const SizedBox(height: 10.0),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              width: cardWidth / 2 +
-                                  25, // Half of the card's width
-                              height: 35.0,
-                              color: Colors.white,
+                            SizedBox(
+                              width: cardWidth / 2 + 25,
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 1.0),
                                 child: Align(
@@ -718,9 +689,6 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                             ),
                             Container(
                               width: cardWidth / 3 - 10,
-                              decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 255, 255, 255),
-                              ),
                               child: Center(
                                 child: Text(
                                   'Rs. ${(calculateTotalPrice(order) + calculateParcelCost(order)).toStringAsFixed(2)} /-',
@@ -732,10 +700,9 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                                 ),
                               ),
                             ),
-
-                            const SizedBox(width: 10.0), // Add some spacing
                           ],
                         ),
+                        const SizedBox(height: 20.0),
                         GestureDetector(
                           onTap: () {
                             confirmOrder(context);
@@ -743,7 +710,7 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                           child: Center(
                             child: Container(
                               height: 40.0,
-                              width: 150,
+                              width: screenWidth * 0.5,
                               decoration: BoxDecoration(
                                 color: const Color(0xFF6552FE),
                                 borderRadius: BorderRadius.circular(20.0),
@@ -793,52 +760,49 @@ class _OrderBillingScreenState extends State<OrderBillingScreen> {
                   ),
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 130,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  'Terms & Conditions*',
-                  style: GoogleFonts.outfit(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.grey[600], // Light grey color
+              const SizedBox(height: 20.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Terms & Conditions*',
+                    style: GoogleFonts.outfit(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.grey[600],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 3.0),
-                Text(
-                  'Cancellation will not be permitted',
-                  style: GoogleFonts.outfit(
-                    fontSize: 9.0,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.grey[600],
+                  const SizedBox(height: 3.0),
+                  Text(
+                    'Cancellation will not be permitted',
+                    style: GoogleFonts.outfit(
+                      fontSize: 9.0,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.grey[600],
+                    ),
                   ),
-                ),
-                Text(
-                  'Order Might Get Delayed due to many uncertainties',
-                  style: GoogleFonts.outfit(
-                    fontSize: 9.0,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.grey[600],
+                  Text(
+                    'Order Might Get Delayed due to many uncertainties',
+                    style: GoogleFonts.outfit(
+                      fontSize: 9.0,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.grey[600],
+                    ),
                   ),
-                ),
-                Text(
-                  'Expected Time is not the exact time of order preparation.',
-                  style: GoogleFonts.outfit(
-                    fontSize: 9.0,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.grey[600],
+                  Text(
+                    'Expected Time is not the exact time of order preparation.',
+                    style: GoogleFonts.outfit(
+                      fontSize: 9.0,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.grey[600],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
-// Do not change in the code

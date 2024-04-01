@@ -180,7 +180,7 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
                 return Text(
                   'PDEU Canteen',
                   style: GoogleFonts.outfit(
-                    fontSize: 28,
+                    fontSize: MediaQuery.of(context).size.width * 0.065,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
@@ -199,15 +199,15 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
                   Text(
                     canteenName,
                     style: GoogleFonts.outfit(
-                      fontSize: 28,
+                      fontSize: MediaQuery.of(context).size.width * 0.065,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 10),
                   Container(
-                    width: 120,
-                    padding: const EdgeInsets.all(8),
+                    width: MediaQuery.of(context).size.width * 0.25,
+                    padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: statusColor,
@@ -320,7 +320,7 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
                                                   Text(
                                                     item['description'],
                                                     style: const TextStyle(
-                                                      fontSize: 14.0,
+                                                      fontSize: 12.0,
                                                       fontWeight:
                                                           FontWeight.w400,
                                                       height: 1.15,
@@ -334,10 +334,17 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
                                             Row(
                                               children: [
                                                 Container(
+                                                  constraints: BoxConstraints(
+                                                    maxWidth: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .width *
+                                                        0.3, // Adjust the width as needed
+                                                  ),
                                                   padding: const EdgeInsets
                                                       .symmetric(
                                                     vertical: 0.0,
-                                                    horizontal: 10.0,
+                                                    horizontal: 5.0,
                                                   ),
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
@@ -352,76 +359,88 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
                                                   child: Text(
                                                     'Rs.${item['price']}',
                                                     style: const TextStyle(
-                                                      fontSize: 14.0,
+                                                      fontSize: 12.0,
                                                       color: Colors.black,
                                                       fontWeight:
                                                           FontWeight.bold,
                                                     ),
+                                                    overflow: TextOverflow
+                                                        .ellipsis, // Handle overflow with ellipsis
                                                   ),
                                                 ),
                                                 const SizedBox(width: 10),
-                                                // Counter Buttons
-                                                ItemCountWidget(
-                                                  itemName: item['name'],
-                                                  initialCount: itemCountMap[
-                                                          item['name']] ??
-                                                      0,
-                                                  onChanged: (count) async {
-                                                    setState(() {
-                                                      itemCountMap[
-                                                          item['name']] = count;
-                                                    });
+                                                // Wrap ItemCountWidget with Flexible
+                                                Flexible(
+                                                  child: ItemCountWidget(
+                                                      itemName: item['name'],
+                                                      initialCount:
+                                                          itemCountMap[item[
+                                                                  'name']] ??
+                                                              0,
+                                                      onChanged: (count) async {
+                                                        setState(() {
+                                                          itemCountMap[item[
+                                                              'name']] = count;
+                                                        });
 
-                                                    if (count > 0) {
-                                                      await FirebaseFirestore
-                                                          .instance
-                                                          .collection('LunchX')
-                                                          .doc('customers')
-                                                          .collection('users')
-                                                          .doc(_currentUser
-                                                              .email)
-                                                          .collection('cart')
-                                                          .doc(item[
-                                                              'name']) // Use the item name as the document ID
-                                                          .set({
-                                                            'name': item[
-                                                                'name'], // Add other item details if needed
-                                                            'count': count,
-                                                            'price':
-                                                                item['price'],
-                                                            'packageprice': item[
-                                                                'packageprice'],
-                                                            'timeofPreparation':
-                                                                item[
-                                                                    'timeofPreparation'],
-                                                            'canteen': item[
-                                                                'canteenName'],
-                                                          })
-                                                          .then((_) => print(
-                                                              'Item stored in database'))
-                                                          .catchError((error) =>
-                                                              print(
-                                                                  'Failed to store item: $error'));
-                                                    } else {
-                                                      // If count is zero, remove the item from the cart collection
-                                                      await FirebaseFirestore
-                                                          .instance
-                                                          .collection('LunchX')
-                                                          .doc('customers')
-                                                          .collection('users')
-                                                          .doc(_currentUser
-                                                              .email)
-                                                          .collection('cart')
-                                                          .doc(item[
-                                                              'name']) // Use the item name as the document ID
-                                                          .delete()
-                                                          .then((_) => print(
-                                                              'Item removed from database'))
-                                                          .catchError((error) =>
-                                                              print(
-                                                                  'Failed to remove item: $error'));
-                                                    }
-                                                  },
+                                                        if (count > 0) {
+                                                          // your code for adding to cart
+                                                          await FirebaseFirestore
+                                                              .instance
+                                                              .collection(
+                                                                  'LunchX')
+                                                              .doc('customers')
+                                                              .collection(
+                                                                  'users')
+                                                              .doc(_currentUser
+                                                                  .email)
+                                                              .collection(
+                                                                  'cart')
+                                                              .doc(item[
+                                                                  'name']) // Use the item name as the document ID
+                                                              .set({
+                                                                'name': item[
+                                                                    'name'], // Add other item details if needed
+                                                                'count': count,
+                                                                'price': item[
+                                                                    'price'],
+                                                                'packageprice':
+                                                                    item[
+                                                                        'packageprice'],
+                                                                'timeofPreparation':
+                                                                    item[
+                                                                        'timeofPreparation'],
+                                                                'canteen': item[
+                                                                    'canteenName'],
+                                                              })
+                                                              .then((_) => print(
+                                                                  'Item stored in database'))
+                                                              .catchError(
+                                                                  (error) => print(
+                                                                      'Failed to store item: $error'));
+                                                        } else {
+                                                          // If count is zero, remove the item from the cart collection
+                                                          await FirebaseFirestore
+                                                              .instance
+                                                              .collection(
+                                                                  'LunchX')
+                                                              .doc('customers')
+                                                              .collection(
+                                                                  'users')
+                                                              .doc(_currentUser
+                                                                  .email)
+                                                              .collection(
+                                                                  'cart')
+                                                              .doc(item[
+                                                                  'name']) // Use the item name as the document ID
+                                                              .delete()
+                                                              .then((_) => print(
+                                                                  'Item removed from database'))
+                                                              .catchError(
+                                                                  (error) => print(
+                                                                      'Failed to remove item: $error'));
+                                                        }
+                                                      }),
                                                 ),
                                               ],
                                             ),
@@ -436,8 +455,8 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
                                         ), // Adjust the radius value as needed
                                         child: Image.network(
                                           item['image'],
-                                          width: 150,
-                                          height: 150,
+                                          width: 130,
+                                          height: 130,
                                           fit: BoxFit.cover,
                                         ),
                                       )
@@ -457,7 +476,7 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
           // Footer
 
           Container(
-            height: 80.0,
+            height: MediaQuery.of(context).size.width * 0.2,
             padding: const EdgeInsets.symmetric(
                 horizontal: 20.0), // Adjust horizontal padding
             decoration: BoxDecoration(
@@ -478,9 +497,10 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
             child: Row(
               children: [
                 Container(
-                  margin: const EdgeInsets.only(
-                      left: 80, right: 10), // Adjust left margin
+                  margin: const EdgeInsets.only(left: 10), // Adjust left margin
                   child: Row(
+                    mainAxisSize:
+                        MainAxisSize.min, // Set main axis size to minimum
                     children: [
                       // Arrow forward icon
                       const Icon(
@@ -488,9 +508,9 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
                         color: Colors.white,
                         size: 24.0,
                       ),
-                      const SizedBox(
-                        width: 10,
-                      ), // Add some space between the icon and text
+                      // const SizedBox(
+                      //   width: 20,
+                      // ), // Add some space between the icon and text
 
                       // Text widget
                       itemCountMap.isEmpty ||
@@ -499,7 +519,8 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
                               'Cart is Hungry!',
                               style: GoogleFonts.outfit(
                                 color: Colors.white,
-                                fontSize: 20,
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.045,
                                 fontWeight: FontWeight.bold,
                               ),
                             )
@@ -507,13 +528,15 @@ class _CanteenMenuPageState extends State<CanteenMenuPage> {
                               'Proceed to Billing',
                               style: GoogleFonts.outfit(
                                 color: Colors.white,
-                                fontSize: 20,
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.045,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                     ],
                   ),
                 ),
+
                 const Spacer(), // Added Spacer to occupy remaining space
                 GestureDetector(
                   onTap: () {
